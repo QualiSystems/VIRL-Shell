@@ -158,6 +158,8 @@ You can also modify existing resources, see [Managing Resources in the Inventory
 
 CloudShell validates the device’s settings and updates the new resource with the device’s structure.
 
+_**VIRL Shell requires you to create an appropriate App template, which would be deployed as part of the sandbox reservation. For details, see the following CloudShell Help article: [Applications' Typical Workflow](https://help.quali.com/Online%20Help/0.0/Portal/Content/CSP/MNG/Mng-Apps.htm?Highlight=App#Adding)**_
+
 # Updating Python Dependencies for Shells
 This section explains how to update your Python dependencies folder. This is required when you upgrade a shell that uses new/updated dependencies. It applies to both online and offline dependencies.
 ### Updating offline Python dependencies
@@ -174,13 +176,6 @@ In online mode, the execution server automatically downloads and extracts the ap
 **To update online Python dependencies:**
 * If there is a live instance of the shell's driver or script, terminate the shell’s instance, as explained [here](http://help.quali.com/Online%20Help/9.0/Portal/Content/CSP/MNG/Mng-Exctn-Srv-Exct.htm#Terminat). If an instance does not exist, the execution server will download the Python dependencies the next time a command of the driver or script runs.
 
-# Typical Workflows 
-
-Virl Shell requires you to create an appropriate App templates, which would be deployed during sandbox reservation.
-For detailed information about App templates, see the following section on the Quali Help:
-
-[Applications' Typical Workflow](https://help.quali.com/Online%20Help/0.0/Portal/Content/CSP/MNG/Mng-Apps.htm?Highlight=App#Adding)
-
 # References
 To download and share integrations, see [Quali Community's Integrations](https://community.quali.com/integrations). 
 
@@ -193,11 +188,13 @@ To connect with Quali users and experts from around the world, ask questions and
 # Release Notes 
 
 ### What's New
+
 For release updates, see the shell's [GitHub releases page](https://github.com/QualiSystems/VIRL-Shell-2G/releases).
 
 ### Known Issues
 * It's not possible to create custom user during topology creation for image type - NX-OSv 9000. Only admin user is available
 * It's not possible to upload custom device configuration during topology creation for image type - IOS XRv 9000.
+
 
 
 [1]: https://github.com/QualiSystems/shellfoundry-tosca-networking-template/blob/master/cloudshell_logo.png
