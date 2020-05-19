@@ -5,7 +5,7 @@ Virtual Internet Routing Lab cloud provider
 
 # VIRL Shell  
 
-Release date: April 2020
+Release date: May 2020
 
 `Shell version: 1.0.0`
 
@@ -45,8 +45,6 @@ Release: VIRL Shell
 ▪ CloudShell version **9.3 and above**
 
 ▪ Other
-
-[Include this note only if the shell is a 2G shell]
 
 **Note:** If your CloudShell version does not support this shell, you should consider upgrading to a later version of CloudShell or contact customer support. 
 
@@ -143,8 +141,8 @@ In CloudShell, the component that models the device is called a resource. It is 
 You can also modify existing resources, see [Managing Resources in the Inventory](http://help.quali.com/Online%20Help/9.0/Portal/Content/CSP/INVN/Mng-Rsrc-in-Invnt.htm?Highlight=managing%20resources).
 
 **To create a resource for the device:**
-  1. In the CloudShell Portal, in the **Inventory** dashboard, click **Add New**. 
-     ![](https://github.com/QualiSystems/cloudshell-shells-documentaion-templates/blob/master/create_a_resource_device.png)
+  1. In the CloudShell Portal, in the **Inventory** dashboard, click **Add New**.
+     ![Image][2]
      
   2. From the list, select **VIRL Shell**.
   
@@ -197,5 +195,5 @@ For release updates, see the shell's [GitHub releases page](https://github.com/Q
 
 
 
-[1]: https://github.com/QualiSystems/shellfoundry-tosca-networking-template/blob/master/cloudshell_logo.png
-[2]: https://github.com/QualiSystems/shellfoundry-tosca-networking-template/blob/master/create_a_resource_device.png
+[1]: https://github.com/QualiSystems/cloudshell-shells-documentaion-templates/blob/master/cloudshell_logo.png
+[2]: https://github.com/QualiSystems/cloudshell-shells-documentaion-templates/blob/master/create_a_resource_device.png
