@@ -274,28 +274,29 @@ class VIRLShellDriver(ResourceDriverInterface):
         logger.info(f"NODE Status: {node_status}")
         ifaces_info = virl_api.get_ifaces_info(topology_name=resource_config.reservation_id)
 
-        timeout = 0
-        while not node_status.get("is_reachable", False) and timeout < int(vm_instance_details.startup_timeout):
-            if node_status.get("is_reachable", False) is not None:
-                logger.info(f"Try to reboot Management interface for node <{app_name}>")
-                virl_api.reboot_mgmt_port(topology_name=resource_config.reservation_id, node_name=app_name)
-                t = IFACE_REBOOT_TIMEOUT
-            else:
-                t = 0
-            time.sleep(MIN_STARTUP_TIMEOUT - t)  # Decrease interface reboot timeout
-            timeout += MIN_STARTUP_TIMEOUT
-            node_status = virl_api.get_nodes_status(topology_name=resource_config.reservation_id).get(app_name, {})
-            logger.info(f"NODE Status: {node_status}")
+        if vm_instance_details.autostart == "True":
+            timeout = 0
+            while not node_status.get("is_reachable", False) and timeout < int(vm_instance_details.startup_timeout):
+                if node_status.get("is_reachable", False) is not None:
+                    logger.info(f"Try to reboot Management interface for node <{app_name}>")
+                    virl_api.reboot_mgmt_port(topology_name=resource_config.reservation_id, node_name=app_name)
+                    t = IFACE_REBOOT_TIMEOUT
+                else:
+                    t = 0
+                time.sleep(MIN_STARTUP_TIMEOUT - t)  # Decrease interface reboot timeout
+                timeout += MIN_STARTUP_TIMEOUT
+                node_status = virl_api.get_nodes_status(topology_name=resource_config.reservation_id).get(app_name, {})
+                logger.info(f"NODE Status: {node_status}")
 
-        if not node_status.get("is_reachable", False):
-            msg = "{app_name} can't changes state to REACHABLE. " \
-                  "Please, verify node configuration using next params: " \
-                  "Console Server: {console_server} " \
-                  "Console Port: {console_port}".format(app_name=app_name,
-                                                        console_server=node_status.get("console_server"),
-                                                        console_port=node_status.get("console_port"))
-            logger.warning(msg)
-            resource_config.api.WriteMessageToReservationOutput(resource_config.reservation_id, f"Warning, {msg}")
+            if not node_status.get("is_reachable", False):
+                msg = "{app_name} can't changes state to REACHABLE. " \
+                      "Please, verify node configuration using next params: " \
+                      "Console Server: {console_server} " \
+                      "Console Port: {console_port}".format(app_name=app_name,
+                                                            console_server=node_status.get("console_server"),
+                                                            console_port=node_status.get("console_port"))
+                logger.warning(msg)
+                resource_config.api.WriteMessageToReservationOutput(resource_config.reservation_id, f"Warning, {msg}")
 
         for vnic_action in subnet_actions:
             network_results.append(ConnectToSubnetActionResult(actionId=vnic_action.actionId))

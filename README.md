@@ -7,7 +7,7 @@ Virtual Internet Routing Lab cloud provider
 
 Release date: May 2020
 
-`Shell version: 1.0.0`
+`Shell version: 1.0.1`
 
 `Document version: 1.0`
 

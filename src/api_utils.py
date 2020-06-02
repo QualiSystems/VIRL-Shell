@@ -33,7 +33,14 @@ def get_reservation_details(api, reservation_id, cloud_provider_name):
             if attr.Name in APP_ATTRS:
                 params.update({attr.Name: attr.Value})
 
-        params.update({"Password": api.DecryptPassword(params.get("Password")).Value})
+        if "User" not in params:
+            params.update({"User": "admin"})
+
+        if "Password" not in params:
+            params.update({"Password": "admin"})
+        else:
+            params.update({"Password": api.DecryptPassword(params.get("Password")).Value})
+
         if "Enable Password" not in params:
             params.update({"Enable Password": params.get("Password", "")})
         else:
