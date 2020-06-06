@@ -26,7 +26,7 @@ Release date: May 2020
 A shell integrates a device model, application or other technology with CloudShell. A shell consists of a data model that defines how the device and its properties are modeled in CloudShell, along with automation that enables interaction with the device via CloudShell.
 
 ### Cloud Provider Shells
-CloudShell's Cloud Providers shells provide L2 or L3 connectivity between resources and/or Apps [remove "and/or Apps" if router].
+CloudShell's Cloud Providers shells provide L2 or L3 connectivity between resources and/or Apps.
 
 ### VIRL Shell
 VIRL Shell provides you with apps deployment and management capabilities. 
@@ -44,7 +44,6 @@ Release: VIRL Shell
 
 ▪ CloudShell version **9.3 and above**
 
-▪ Other
 
 **Note:** If your CloudShell version does not support this shell, you should consider upgrading to a later version of CloudShell or contact customer support. 
 
