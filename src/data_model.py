@@ -12,7 +12,7 @@ class VIRLShellDriverResource(object):
         self.attributes = {}
         self.resources = {}
         self._context = context
-        self._cloudshell_model_name = "VIRL Shell"
+        self._cloudshell_model_name = "VIRL Shell 2G"
         self._name = name
 
     @classmethod

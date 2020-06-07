@@ -71,7 +71,3 @@ class ConfigBuilder:
                                                                                            port_id_start=port_id_start,
                                                                                            delimiter=delimiter))
         return config
-
-
-if __name__ == "__main__":
-    pass

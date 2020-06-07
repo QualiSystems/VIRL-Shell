@@ -112,9 +112,6 @@ class VIRLShellDriver(ResourceDriverInterface):
 
             logger.info("Initial Reservation <{res_id}> Details: {details}".format(res_id=r_id,
                                                                                    details=reservation_details))
-            if resource_config.reservation_id != r_id:
-                raise VIRLShellError("Wrong reservation details obtained")
-
             json_request = json.loads(request)
 
             vcn_action_id = ""
@@ -215,6 +212,7 @@ class VIRLShellDriver(ResourceDriverInterface):
             results.extend(subnet_results)
 
             result = DriverResponse(results).to_driver_response_json()
+            logger.info(f"Prepare result {result}")
             return result
 
     def Deploy(self, context, request=None, cancellation_context=None):
@@ -222,7 +220,8 @@ class VIRLShellDriver(ResourceDriverInterface):
 
         actions = self.request_parser.convert_driver_request_to_actions(request)
         resource_config = ShellResource.create_from_context(context)
-        # api.WriteMessageToReservationOutput(context.reservation.reservation_id, 'Request JSON: ' + request)
+        # resource_config.api.WriteMessageToReservationOutput(context.reservation.reservation_id,
+        #                                                     'Request JSON: ' + request)
         with LoggingSessionContext(context) as logger:
 
             deploy_action = None
@@ -242,6 +241,7 @@ class VIRLShellDriver(ResourceDriverInterface):
                 except StopIteration:
                     raise VIRLShellError("Could not find the deployment " + deployment_name)
                 results = deploy_method(resource_config, logger, deploy_action, subnet_actions, cancellation_context)
+                logger.info("Deploy result {}".format(DriverResponse(results).to_driver_response_json()))
                 return DriverResponse(results).to_driver_response_json()
             else:
                 raise VIRLShellError("Failed to deploy VM")
@@ -270,32 +270,43 @@ class VIRLShellDriver(ResourceDriverInterface):
                             username=resource_config.username,
                             password=resource_config.password)
 
-        node_status = virl_api.get_nodes_status(topology_name=resource_config.reservation_id).get(app_name, {})
+        # node_status = virl_api.get_nodes_status(topology_name=resource_config.reservation_id).get(app_name, {})
+        nodes_status = virl_api.get_nodes_status(topology_name=resource_config.reservation_id)
+
+        node_status = {}
+        for node_name, node_info in nodes_status.items():
+            if node_name.startswith("{app_name}-{res_id}".format(app_name=app_name.replace(" ", "-"),
+                                                                 res_id=resource_config.reservation_id[-2:])):
+                app_name = node_name
+                node_status = node_info
+                break
+
         logger.info(f"NODE Status: {node_status}")
-        ifaces_info = virl_api.get_ifaces_info(topology_name=resource_config.reservation_id)
 
-        timeout = 0
-        while not node_status.get("is_reachable", False) and timeout < int(vm_instance_details.startup_timeout):
-            if node_status.get("is_reachable", False) is not None:
-                logger.info(f"Try to reboot Management interface for node <{app_name}>")
-                virl_api.reboot_mgmt_port(topology_name=resource_config.reservation_id, node_name=app_name)
-                t = IFACE_REBOOT_TIMEOUT
-            else:
-                t = 0
-            time.sleep(MIN_STARTUP_TIMEOUT - t)  # Decrease interface reboot timeout
-            timeout += MIN_STARTUP_TIMEOUT
-            node_status = virl_api.get_nodes_status(topology_name=resource_config.reservation_id).get(app_name, {})
-            logger.info(f"NODE Status: {node_status}")
+        if vm_instance_details.autostart == "True":
+            timeout = 0
+            while not node_status.get("is_reachable", False) and timeout < int(vm_instance_details.startup_timeout):
+                if node_status.get("is_reachable", False) is not None:
+                    logger.info(f"Try to reboot Management interface for node <{app_name}>")
+                    virl_api.reboot_mgmt_port(topology_name=resource_config.reservation_id, node_name=app_name)
+                    t = IFACE_REBOOT_TIMEOUT
+                else:
+                    t = 0
+                time.sleep(MIN_STARTUP_TIMEOUT - t)  # Decrease interface reboot timeout
+                timeout += MIN_STARTUP_TIMEOUT
+                logger.info(f"App Name: {app_name}")
+                node_status = virl_api.get_nodes_status(topology_name=resource_config.reservation_id).get(app_name, {})
+                logger.info(f"NODE Status: {node_status}")
 
-        if not node_status.get("is_reachable", False):
-            msg = "{app_name} can't changes state to REACHABLE. " \
-                  "Please, verify node configuration using next params: " \
-                  "Console Server: {console_server} " \
-                  "Console Port: {console_port}".format(app_name=app_name,
-                                                        console_server=node_status.get("console_server"),
-                                                        console_port=node_status.get("console_port"))
-            logger.warning(msg)
-            resource_config.api.WriteMessageToReservationOutput(resource_config.reservation_id, f"Warning, {msg}")
+            if not node_status.get("is_reachable", False):
+                msg = "{app_name} can't changes state to REACHABLE. " \
+                      "Please, verify node configuration using next params: " \
+                      "Console Server: {console_server} " \
+                      "Console Port: {console_port}".format(app_name=app_name,
+                                                            console_server=node_status.get("console_server"),
+                                                            console_port=node_status.get("console_port"))
+                logger.warning(msg)
+                resource_config.api.WriteMessageToReservationOutput(resource_config.reservation_id, f"Warning, {msg}")
 
         for vnic_action in subnet_actions:
             network_results.append(ConnectToSubnetActionResult(actionId=vnic_action.actionId))
@@ -306,6 +317,9 @@ class VIRLShellDriver(ResourceDriverInterface):
                       Attribute("SNMP Read Community", vm_instance_details.snmp_community),
                       Attribute("Console Server IP Address", node_status.get("console_server")),
                       Attribute("Console Port", node_status.get("console_port"))]
+
+        ifaces_info = virl_api.get_ifaces_info(topology_name=resource_config.reservation_id)
+        logger.info(f"Interface info: {ifaces_info}")
 
         deploy_result = DeployAppResult(actionId=deploy_action.actionId,
                                         infoMessage="Deployment Completed Successfully",
@@ -320,7 +334,6 @@ class VIRLShellDriver(ResourceDriverInterface):
                                                                         )
                                         )
         if cancellation_context.is_cancelled:
-            # oci_ops.compute_ops.terminate_instance(instance.id)
             return "Deployment cancelled and deleted successfully"
 
         action_results = [deploy_result]
