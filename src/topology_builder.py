@@ -61,6 +61,8 @@ class Connection:
 
 
 class Topology:
+    NO_IP_ADDRESS = "no ip address"
+
     def __init__(self, resources, connections, subnets, default_gateway_info):
         """  """
 
@@ -124,6 +126,10 @@ class Topology:
                                         netmask=str(netmask),
                                         description="to {}".format(dst if src == node_name else src)))
                     iface_id += 1
+            for interface in range(0, int(params.get("additional interfaces", 0))):
+                ifaces.append(IFace(id=str(iface_id),
+                                    description="additional interface"))
+                iface_id += 1
 
             node = Node(name=node_name,
                         subtype=params.get("image type", "IOSv"),
@@ -217,7 +223,14 @@ class Topology:
 
         xml_nodes = []
         for node in nodes:
-            ifaces = [INTERFACE(id=str(iface.id), ipv4=str(iface.address)) for iface in node.ifaces]
+            # ifaces = [INTERFACE(id=str(iface.id), ipv4=str(iface.address)) for iface in node.ifaces]
+            ifaces = []
+            for iface in node.ifaces:
+                if iface.address:
+                    ifaces.append(INTERFACE(id=str(iface.id), ipv4=str(iface.address)))
+                else:
+                    ifaces.append(INTERFACE(id=str(iface.id)))
+
             entries = [ENTRY("all", key="ansible_group", type="String"),
                        ENTRY("false", key="Auto-generate config", type="Boolean")]
             if node.config:
@@ -254,3 +267,48 @@ class Topology:
         )
 
         return topology
+
+
+if __name__ == "__main__":
+    # VIRL_RESOURCES = {
+    #     "IOSv": {"Image Type": "IOSv", "AutoStart": "False", "User": "quali_user", "Password": "quali_pass",
+    #              "Enable Password": "quali_enable_password"},
+    # }
+    VIRL_RESOURCES = {
+        'resources': {
+            'IOSv': {'image type': 'IOSv',
+                     'autostart': 'True',
+                     'startup timeout': '300',
+                     "additional interfaces": 4,
+                     'Password': 'quali',
+                     'User': 'quali',
+                     'Enable Password': 'quali'},
+            # 'IOSv_1': {'image type': 'IOSv',
+            #            'autostart': 'True',
+            #            'startup timeout': '300',
+            #            'Password': 'quali',
+            #            'User': 'quali',
+            #            'Enable Password': 'quali'}
+                     },
+        'connections': [],
+        # 'connections': [{'src': 'IOSv', 'dst': 'Subnet - 10.0.0.16-10.0.0.31', 'network': '10.0.0.16/28'},
+        #                 {'src': 'IOSv', 'dst': 'IOSv_1', 'network': '10.0.0.0/28'}],
+        'subnets': {},
+        'default_gateway_info': ('192.168.105.1', '0.0.0.0/24')
+        }
+    res_details = VIRL_RESOURCES
+    # subnet_action_id = "qwerty"
+    # subnet_action_cidr = "10.0.0.0/28"
+    # action_id = None
+    # for connection in res_details.get("connections", []):
+    #     if connection.get("network") == subnet_action_cidr:
+    #         action_id = subnet_action_id
+    #         break
+    # if not action_id and subnet_action_cidr in res_details.get("subnets", {}).values():
+    #     action_id = subnet_action_id
+    # else:
+    #     raise VIRLShellError(f"Couldn't find appropriate network for action id {subnet_action_id}")
+    topo = Topology(**VIRL_RESOURCES)
+    # topo = Topology(resources=VIRL_RESOURCES, connections={}, subnets={}, default_gateway="192.168.26.1")
+    data = topo.create_topology()
+    # print(data)

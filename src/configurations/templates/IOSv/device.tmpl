@@ -16,6 +16,7 @@ no service config
 ip ssh version 2
 ip ssh server algorithm authentication password
 ip scp server enable
+ip route 0.0.0.0 0.0.0.0 {default_gateway}
 !
 snmp-server chassis-id
 snmp-server community {snmp_community} RO

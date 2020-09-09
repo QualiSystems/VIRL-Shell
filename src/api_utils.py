@@ -6,7 +6,7 @@ import uuid
 from virl_exceptions import VIRLShellError
 
 STARTUP_TIMEOUT_KEY = "startup timeout"
-DEPLOYMENT_ATTRS = ["image type", "autostart", STARTUP_TIMEOUT_KEY]
+DEPLOYMENT_ATTRS = ["image type", "autostart", "additional interfaces", STARTUP_TIMEOUT_KEY]
 MIN_STARTUP_TIMEOUT = 30  # seconds
 APP_ATTRS = ["User", "Password", "Enable Password"]
 
@@ -102,4 +102,6 @@ def get_reservation_details(api, reservation_id, cloud_provider_name):
         elif target in subnets:
             connections.append({"src": source, "dst": target, "network": subnets[target]})
 
-    return details.Id, {"resources": virl_resources, "connections": connections, "subnets": subnets}
+    return details.Id, {"resources": virl_resources,
+                        "connections": connections,
+                        "subnets": subnets}

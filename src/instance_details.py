@@ -22,6 +22,10 @@ class InstanceDetails(object):
         return self._deploy_attribs.get("{}.StartUp Timeout".format(self._deployment_path), "")
 
     @property
+    def additional_interfaces(self):
+        return self._deploy_attribs.get("{}.Additional Interfaces".format(self._deployment_path), "")
+
+    @property
     def user(self):
         return self._app_resource.get("User")
 

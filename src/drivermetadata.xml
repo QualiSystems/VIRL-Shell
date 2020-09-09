@@ -25,6 +25,13 @@
             <Command Description="" DisplayName="Get VmDetails" EnableCancellation="true" Name="GetVmDetails"
                      Tags="allow_unreserved"/>
         </Category>
+        <Category Name="Console">
+        <Command Description="Allows console connection and generates the command to access it"
+                 DisplayName="Console"
+                 Name="console"
+                 Tags="remote_connectivity,allow_unreserved">
+        </Command>
+        </Category>
         <Category Name="Power">
             <Command Description="" DisplayName="Power On" Name="PowerOn" Tags="power"/>
             <Command Description="" DisplayName="Power Off" Name="PowerOff" Tags="power"/>
