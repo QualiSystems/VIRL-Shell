@@ -44,9 +44,8 @@ class ConfigBuilder:
 
     def ports(self, ifaces, port_id_start=1, delimiter="!"):
         """ Build configuration for all ports apart from Management """
-        new_delim = "\n{}\n".format(delimiter)
-        ports = "\n"
-        ports += new_delim.join([self._read_config(self.port_template_path).format(id=int(iface.id) + port_id_start,
+        delimiter = "\n{}\n".format(delimiter)
+        ports = new_delim.join([self._read_config(self.port_template_path).format(id=int(iface.id) + port_id_start,
                                                                                   address=iface.address,
                                                                                   netmask=iface.netmask,
                                                                                   description=iface.description) for
