@@ -124,6 +124,10 @@ class Topology:
                                         netmask=str(netmask),
                                         description="to {}".format(dst if src == node_name else src)))
                     iface_id += 1
+            for interface in range(0, int(params.get("additional interfaces", 0))):
+                ifaces.append(IFace(id=str(iface_id),
+                                    description="additional interface"))
+                iface_id += 1
 
             node = Node(name=node_name,
                         subtype=params.get("image type", "IOSv"),
@@ -217,7 +221,14 @@ class Topology:
 
         xml_nodes = []
         for node in nodes:
-            ifaces = [INTERFACE(id=str(iface.id), ipv4=str(iface.address)) for iface in node.ifaces]
+            # ifaces = [INTERFACE(id=str(iface.id), ipv4=str(iface.address)) for iface in node.ifaces]
+            ifaces = []
+            for iface in node.ifaces:
+                if iface.address:
+                    ifaces.append(INTERFACE(id=str(iface.id), ipv4=str(iface.address)))
+                else:
+                    ifaces.append(INTERFACE(id=str(iface.id)))
+
             entries = [ENTRY("all", key="ansible_group", type="String"),
                        ENTRY("false", key="Auto-generate config", type="Boolean")]
             if node.config:

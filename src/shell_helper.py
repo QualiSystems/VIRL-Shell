@@ -14,7 +14,10 @@ def create_vm_details(vm_name, mgmt_network, node_type, node_ifaces):
     vm_network_data = []
     for iface in node_ifaces:
         network = iface.get("network")
-        if not network or network == mgmt_network:
+        exclusion_network_name = f"{vm_name}-unconnected"
+        if not network \
+                or network == mgmt_network\
+                or network.lower().startswith(exclusion_network_name.lower()):
             continue
         vm_nic = VmDetailsNetworkInterface()
         vm_nic.interfaceId = iface.get("port_id")

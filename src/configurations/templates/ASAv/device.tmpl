@@ -24,6 +24,8 @@ route mgmt 0.0.0.0 0.0.0.0 {default_gateway}
 !
 user-identity default-domain LOCAL
 aaa authentication ssh console LOCAL
+http server enable
+http 0.0.0.0 0.0.0.0 mgmt
 ssh 0.0.0.0 0.0.0.0 mgmt
 telnet 0.0.0.0 0.0.0.0 mgmt
 ssh version 2

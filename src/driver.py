@@ -10,7 +10,6 @@ import time
 from requests import HTTPError
 
 from cloudshell.shell.core.driver_context import AutoLoadDetails, ResourceRemoteCommandContext
-
 from cloudshell.cp.core import DriverRequestParser
 from cloudshell.cp.core.models import DeployApp, DeployAppResult, DriverResponse, Attribute, ConnectSubnet, \
     PrepareSubnetActionResult, ConnectToSubnetActionResult
@@ -339,6 +338,25 @@ class VIRLShellDriver(ResourceDriverInterface):
         action_results = [deploy_result]
         action_results.extend(network_results)
         return action_results
+
+    def console(self, context, ports):
+        """Generates a command for a console access to an instance"""
+        resource_config = ShellResource.create_from_context(context)
+
+        with LoggingSessionContext(context) as logger:
+            instance_id = resource_config.remote_instance_id
+            virl_api = VIRL_API(host=resource_config.address,
+                                std_port=resource_config.std_port,
+                                uwm_port=resource_config.uwm_port,
+                                username=resource_config.username,
+                                password=resource_config.password)
+
+            # node_status = virl_api.get_nodes_status(topology_name=resource_config.reservation_id).get(app_name, {})
+            nodes_status = virl_api.get_nodes_status(topology_name=resource_config.reservation_id)
+            node_status = nodes_status.get(instance_id, {})
+            ip = node_status.get("console_server")
+            port = node_status.get("console_port")
+            return f"Console IP and port are:\n{ip}:{port}\n"
 
     def DeleteInstance(self, context, ports):
         """ Delete a VM
