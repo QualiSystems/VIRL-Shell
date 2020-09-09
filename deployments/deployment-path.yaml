@@ -41,6 +41,11 @@ node_types:
         type: integer
         default: 300
         tags: [user_input]
+      Additional Interfaces:
+        description: Specify amount of additional interfaces
+        type: integer
+        default: 0
+        tags: [ user_input ]
     artifacts:
       icon:
         file: Cisco.png
