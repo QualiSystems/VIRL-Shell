@@ -44,13 +44,13 @@ class ConfigBuilder:
 
     def ports(self, ifaces, port_id_start=1, delimiter="!"):
         """ Build configuration for all ports apart from Management """
-        delimiter = "\n{}\n".format(delimiter)
-        ports = new_delim.join([self._read_config(self.port_template_path).format(id=int(iface.id) + port_id_start,
-                                                                                  address=iface.address,
-                                                                                  netmask=iface.netmask,
-                                                                                  description=iface.description) for
-                                iface in ifaces])
-        return f"\nports\n"
+        ports = f"\n{delimiter}\n".join(
+            [self._read_config(self.port_template_path).format(id=int(iface.id) + port_id_start,
+                                                               address=iface.address,
+                                                               netmask=iface.netmask,
+                                                               description=iface.description) for
+             iface in ifaces])
+        return f"\n{ports}\n"
 
     def config(self):
         """ Build full device configuration """
