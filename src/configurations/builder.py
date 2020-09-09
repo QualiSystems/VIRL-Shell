@@ -51,8 +51,7 @@ class ConfigBuilder:
                                                                                   netmask=iface.netmask,
                                                                                   description=iface.description) for
                                 iface in ifaces])
-        ports += "\n"
-        return ports
+        return f"\nports\n"
 
     def config(self):
         """ Build full device configuration """
